@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 import sklearn
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,11 +14,13 @@ from src.housing_intel.schemas import (
     DealScoreRequest,
     DealScoreResponse,
     HealthResponse,
+    LocationOptionsResponse,
     MarketPositionResponse,
     MarketSummaryResponse,
     MetadataOptionsResponse,
     PredictionResponse,
     PropertyPayload,
+    ReferenceRangeResponse,
 )
 from src.housing_intel.services import (
     comparable_listings_response,
@@ -26,12 +30,25 @@ from src.housing_intel.services import (
     market_position_response_from_payload,
     market_summary_records,
     metadata_options,
+    model_confidence_response,
     prediction_response_from_payload,
     public_path,
+    location_options,
+    reference_range_response,
 )
 
 
-API_VERSION = "0.1.0"
+API_VERSION = "0.3.0"
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    for loader in (get_model_artifact, get_market_data):
+        try:
+            loader()
+        except Exception:
+            pass
+    yield
 
 
 app = FastAPI(
@@ -39,8 +56,9 @@ app = FastAPI(
     version=API_VERSION,
     description=(
         "FastAPI backend for house price prediction, market benchmarks, "
-        "comparable listings, and deal scoring."
+        "reference price ranges, and comparable listings."
     ),
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -104,6 +122,17 @@ def read_metadata_options() -> MetadataOptionsResponse:
         return MetadataOptionsResponse(**metadata_options())
     except Exception as exc:
         raise HTTPException(status_code=503, detail=f"Cannot load metadata options: {exc}") from exc
+
+
+@app.get("/metadata/locations", response_model=LocationOptionsResponse, tags=["metadata"])
+def read_location_options(
+    district_name: str = Query(..., min_length=1),
+    ward_name: str | None = Query(default=None),
+) -> LocationOptionsResponse:
+    try:
+        return LocationOptionsResponse(**location_options(district_name, ward_name))
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Cannot load location options: {exc}") from exc
 
 
 @app.post("/predict", response_model=PredictionResponse, tags=["valuation"])
@@ -183,10 +212,20 @@ def analyze_property(request: AnalysisRequest) -> AnalysisResponse:
             request.property,
             top_n=request.comparable_limit,
         )
-        deal_score = deal_score_response(
+        reference_range = reference_range_response(
             payload=request.property,
-            asking_price_vnd=request.asking_price_vnd,
-            predicted_price_vnd=prediction.predicted_price_vnd if prediction else None,
+            prediction=prediction,
+            market_position=market_position,
+        )
+        model_confidence = model_confidence_response(prediction)
+        deal_score = (
+            deal_score_response(
+                payload=request.property,
+                asking_price_vnd=request.asking_price_vnd,
+                predicted_price_vnd=prediction.predicted_price_vnd if prediction else None,
+            )
+            if request.asking_price_vnd is not None
+            else None
         )
     except Exception as exc:
         raise HTTPException(status_code=503, detail=f"Analysis failed: {exc}") from exc
@@ -196,6 +235,8 @@ def analyze_property(request: AnalysisRequest) -> AnalysisResponse:
         prediction=prediction,
         prediction_error=prediction_error,
         market_position=market_position,
+        reference_range=reference_range,
+        model_confidence=model_confidence,
         deal_score=deal_score,
         comparables=comparables,
     )

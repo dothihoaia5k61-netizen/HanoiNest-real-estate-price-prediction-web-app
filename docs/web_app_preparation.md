@@ -29,9 +29,10 @@ MVP nên có 5 màn hình chính:
    - Tìm 5-20 listing giống nhất.
    - Bảng so sánh: quận, phường, đường, diện tích, giá, giá/m2, số phòng.
 
-4. **Deal Score**
-   - Chấm điểm 0-100.
-   - Tách score thành: giá, vị trí, độ đầy đủ dữ liệu, độ lệch so với thị trường.
+4. **Dải giá tham chiếu**
+   - Hiển thị Q25, median và Q75 theo nhóm thị trường tương tự.
+   - Cho biết giá model nằm trong, thấp hơn hay cao hơn dải giá phổ biến.
+   - Hiển thị độ phủ dữ liệu thay vì đưa ra điểm mua/bán dễ gây hiểu nhầm.
 
 5. **Market Dashboard**
    - Giá/m2 theo quận.

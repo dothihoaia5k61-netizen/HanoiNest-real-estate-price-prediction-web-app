@@ -24,8 +24,10 @@ from src.housing_intel.schemas import (
     ComparableListingsResponse,
     DealScoreResponse,
     MarketPositionResponse,
+    ModelConfidenceResponse,
     PredictionResponse,
     PropertyPayload,
+    ReferenceRangeResponse,
 )
 
 
@@ -123,6 +125,101 @@ def deal_score_response(
     return DealScoreResponse(**clean_json_value(data))
 
 
+def reference_range_response(
+    payload: PropertyPayload,
+    prediction: PredictionResponse | None,
+    market_position: MarketPositionResponse | None,
+) -> ReferenceRangeResponse | None:
+    if (
+        market_position is None
+        or market_position.q25_price_per_m2_vnd is None
+        or market_position.median_price_per_m2_vnd is None
+        or market_position.q75_price_per_m2_vnd is None
+    ):
+        return None
+
+    low_price = market_position.q25_price_per_m2_vnd * payload.area
+    median_price = market_position.median_price_per_m2_vnd * payload.area
+    high_price = market_position.q75_price_per_m2_vnd * payload.area
+    model_gap = None
+    model_position = "Chưa có giá model"
+
+    if prediction is not None and median_price > 0:
+        model_gap = (prediction.predicted_price_vnd - median_price) / median_price * 100
+        if prediction.predicted_price_vnd < low_price:
+            model_position = "Thấp hơn dải thị trường"
+        elif prediction.predicted_price_vnd > high_price:
+            model_position = "Cao hơn dải thị trường"
+        else:
+            model_position = "Nằm trong dải thị trường"
+
+    spread = (high_price - low_price) / median_price * 100 if median_price > 0 else 0.0
+    listing_count = market_position.listing_count
+    if listing_count >= 1000:
+        coverage = "Độ phủ dữ liệu cao"
+    elif listing_count >= 100:
+        coverage = "Độ phủ dữ liệu khá"
+    elif listing_count >= 30:
+        coverage = "Độ phủ dữ liệu vừa"
+    else:
+        coverage = "Độ phủ dữ liệu thấp"
+
+    return ReferenceRangeResponse(
+        low_price_vnd=low_price,
+        median_price_vnd=median_price,
+        high_price_vnd=high_price,
+        formatted_low_price=format_vnd(low_price),
+        formatted_median_price=format_vnd(median_price),
+        formatted_high_price=format_vnd(high_price),
+        model_gap_to_median_percent=model_gap,
+        model_position=model_position,
+        market_spread_percent=spread,
+        data_coverage_label=coverage,
+        listing_count=listing_count,
+    )
+
+
+def model_confidence_response(
+    prediction: PredictionResponse | None,
+) -> ModelConfidenceResponse | None:
+    if prediction is None:
+        return None
+
+    artifact = get_model_artifact()
+    selected_model = artifact.get("selected_model")
+    metrics = artifact.get("metrics", {}).get(selected_model, {})
+    required = ("mae", "rmse", "mape_percent", "r2")
+    if not all(key in metrics for key in required):
+        return None
+
+    mae = float(metrics["mae"])
+    rmse = float(metrics["rmse"])
+    mape = float(metrics["mape_percent"])
+    r2 = float(metrics["r2"])
+    low_price = max(0.0, prediction.predicted_price_vnd - mae)
+    high_price = prediction.predicted_price_vnd + mae
+
+    if r2 >= 0.85 and mape <= 20:
+        label = "Độ tin cậy cao"
+    elif r2 >= 0.75:
+        label = "Độ tin cậy khá"
+    else:
+        label = "Cần thêm dữ liệu kiểm chứng"
+
+    return ModelConfidenceResponse(
+        low_price_vnd=low_price,
+        high_price_vnd=high_price,
+        formatted_low_price=format_vnd(low_price),
+        formatted_high_price=format_vnd(high_price),
+        mae_vnd=mae,
+        rmse_vnd=rmse,
+        mape_percent=mape,
+        r2=r2,
+        label=label,
+        methodology="Khoảng ước tính dựa trên sai số tuyệt đối trung bình (MAE) của tập validation.",
+    )
+
+
 def market_summary_records(group_by: str, min_count: int) -> list[dict[str, Any]]:
     if group_by not in SUMMARY_GROUP_COLUMNS:
         allowed = ", ".join(sorted(SUMMARY_GROUP_COLUMNS))
@@ -140,6 +237,31 @@ def metadata_options() -> dict[str, list[str]]:
         "house_directions": sorted_unique(df, "house_direction"),
         "balcony_directions": sorted_unique(df, "balcony_direction"),
     }
+
+
+def location_options(district_name: str, ward_name: str | None = None) -> dict[str, Any]:
+    df = get_market_data()
+    district_rows = df[df["district_name"].eq(district_name)]
+    wards = ranked_unique(district_rows, "ward_name")
+
+    street_rows = district_rows
+    if ward_name and ward_name != "Unknown":
+        street_rows = district_rows[district_rows["ward_name"].eq(ward_name)]
+
+    return {
+        "district_name": district_name,
+        "ward_name": ward_name,
+        "wards": wards,
+        "streets": ranked_unique(street_rows, "street_name"),
+    }
+
+
+def ranked_unique(df: pd.DataFrame, column: str) -> list[str]:
+    if column not in df.columns:
+        return []
+    values = df[column].dropna().astype(str).str.strip()
+    values = values[values.ne("") & values.ne("Unknown")]
+    return values.value_counts().index.tolist()
 
 
 def sorted_unique(df: pd.DataFrame, column: str) -> list[str]:

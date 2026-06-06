@@ -107,6 +107,8 @@ def summarize_by(
 def market_position_for_payload(df: pd.DataFrame, payload: dict[str, Any]) -> MarketPosition | None:
     district = payload.get("district_name")
     property_type = payload.get("property_type_name")
+    ward = payload.get("ward_name")
+    street = payload.get("street_name")
 
     candidates = df.copy()
     group_parts = []
@@ -118,6 +120,14 @@ def market_position_for_payload(df: pd.DataFrame, payload: dict[str, Any]) -> Ma
     if property_type:
         candidates = candidates[candidates["property_type_name"].eq(property_type)]
         group_parts.append(str(property_type))
+
+    for column, value in [("ward_name", ward), ("street_name", street)]:
+        if not value or value == "Unknown":
+            continue
+        narrower = candidates[candidates[column].eq(value)]
+        if len(narrower) >= 10:
+            candidates = narrower
+            group_parts.append(str(value))
 
     if len(candidates) < 10:
         return None
@@ -141,6 +151,8 @@ def find_comparable_listings(
 
     district = payload.get("district_name")
     property_type = payload.get("property_type_name")
+    ward = payload.get("ward_name")
+    street = payload.get("street_name")
     area = payload.get("area")
 
     if district:
@@ -151,6 +163,12 @@ def find_comparable_listings(
 
     if candidates.empty:
         return candidates
+
+    candidates = candidates.assign(location_rank=2)
+    if ward and ward != "Unknown":
+        candidates.loc[candidates["ward_name"].eq(ward), "location_rank"] = 1
+    if street and street != "Unknown":
+        candidates.loc[candidates["street_name"].eq(street), "location_rank"] = 0
 
     area_value = pd.to_numeric(pd.Series([area]), errors="coerce").iloc[0]
     if pd.notna(area_value) and float(area_value) > 0:
@@ -170,10 +188,14 @@ def find_comparable_listings(
         "bedroom_count",
         "bathroom_count",
         "published_at",
+        "location_rank",
         "area_distance",
     ]
     existing_columns = [col for col in preferred_columns if col in candidates.columns]
-    return candidates.sort_values(["area_distance", "price_per_m2"], na_position="last").head(top_n)[existing_columns]
+    return candidates.sort_values(
+        ["location_rank", "area_distance", "price_per_m2"],
+        na_position="last",
+    ).head(top_n)[existing_columns]
 
 
 def compute_deal_score(

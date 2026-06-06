@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class PropertyPayload(BaseModel):
@@ -41,6 +41,12 @@ class PropertyPayload(BaseModel):
         if isinstance(value, str) and not value.strip():
             return "Unknown"
         return value
+
+    @model_validator(mode="after")
+    def derive_house_depth(self) -> "PropertyPayload":
+        if self.frontage_width and self.frontage_width > 0:
+            self.house_depth = self.area / self.frontage_width
+        return self
 
     def to_core_payload(self) -> dict[str, Any]:
         return self.model_dump()
@@ -88,6 +94,33 @@ class DealScoreResponse(BaseModel):
     notes: list[str]
 
 
+class ReferenceRangeResponse(BaseModel):
+    low_price_vnd: float
+    median_price_vnd: float
+    high_price_vnd: float
+    formatted_low_price: str
+    formatted_median_price: str
+    formatted_high_price: str
+    model_gap_to_median_percent: float | None
+    model_position: str
+    market_spread_percent: float
+    data_coverage_label: str
+    listing_count: int
+
+
+class ModelConfidenceResponse(BaseModel):
+    low_price_vnd: float
+    high_price_vnd: float
+    formatted_low_price: str
+    formatted_high_price: str
+    mae_vnd: float
+    rmse_vnd: float
+    mape_percent: float
+    r2: float
+    label: str
+    methodology: str
+
+
 class AnalysisRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -101,7 +134,9 @@ class AnalysisResponse(BaseModel):
     prediction: PredictionResponse | None
     prediction_error: str | None
     market_position: MarketPositionResponse | None
-    deal_score: DealScoreResponse
+    reference_range: ReferenceRangeResponse | None
+    model_confidence: ModelConfidenceResponse | None
+    deal_score: DealScoreResponse | None
     comparables: ComparableListingsResponse
 
 
@@ -117,6 +152,13 @@ class MetadataOptionsResponse(BaseModel):
     districts: list[str]
     house_directions: list[str]
     balcony_directions: list[str]
+
+
+class LocationOptionsResponse(BaseModel):
+    district_name: str
+    ward_name: str | None
+    wards: list[str]
+    streets: list[str]
 
 
 class HealthResponse(BaseModel):

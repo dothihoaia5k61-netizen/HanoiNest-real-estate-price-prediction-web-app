@@ -57,6 +57,18 @@ def main() -> None:
     assert metadata["districts"], metadata
     assert metadata["property_types"], metadata
 
+    locations_response = client.get(
+        "/metadata/locations",
+        params={
+            "district_name": SAMPLE_PAYLOAD["district_name"],
+            "ward_name": SAMPLE_PAYLOAD["ward_name"],
+        },
+    )
+    assert locations_response.status_code == 200, locations_response.text
+    locations = checked_json(locations_response)
+    assert locations["wards"], locations
+    assert locations["streets"], locations
+
     predict_response = client.post("/predict", json=SAMPLE_PAYLOAD)
     assert predict_response.status_code == 200, predict_response.text
     prediction = checked_json(predict_response)
@@ -101,6 +113,10 @@ def main() -> None:
     analysis = checked_json(analysis_response)
     assert analysis["prediction"] is not None, analysis
     assert analysis["prediction_error"] is None, analysis
+    assert analysis["reference_range"] is not None, analysis
+    assert analysis["model_confidence"] is not None, analysis
+    assert analysis["model_confidence"]["low_price_vnd"] < prediction["predicted_price_vnd"]
+    assert analysis["model_confidence"]["high_price_vnd"] > prediction["predicted_price_vnd"]
     assert 0 <= analysis["comparables"]["total"] <= 3, analysis
 
     invalid_summary = client.get("/market/summary?group_by=bad_column")
@@ -119,6 +135,8 @@ def main() -> None:
                 "comparables": comparables["total"],
                 "summary_rows": summary["total"],
                 "deal_score": score["score"],
+                "wards": len(locations["wards"]),
+                "streets": len(locations["streets"]),
             },
             ensure_ascii=True,
         )

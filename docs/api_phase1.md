@@ -43,6 +43,13 @@ Returns filter options derived from the prepared listing data:
 - `house_directions`
 - `balcony_directions`
 
+### GET /metadata/locations
+
+Returns cascading address options for the frontend:
+
+- wards filtered by `district_name`
+- streets filtered by `district_name` and optional `ward_name`
+
 ### POST /predict
 
 Runs the trained model for one property payload.
@@ -78,8 +85,10 @@ One-shot endpoint for the future web frontend. It returns:
 
 - normalized input
 - model prediction
+- model confidence range derived from validation MAE
 - market position
-- deal score
+- reference price range from Q25, median, and Q75
+- optional legacy deal score when an asking price is supplied
 - comparable listings
 
 If model prediction fails but market data is available, this endpoint keeps the
