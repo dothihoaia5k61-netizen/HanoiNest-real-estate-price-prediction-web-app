@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
 NUMERIC_COLUMNS = [
     "price",
     "area",
@@ -43,7 +45,10 @@ class DealScore:
 
 
 def load_listing_data(path: str | Path = "hanoi_real_estate.csv") -> pd.DataFrame:
-    return pd.read_csv(path)
+    resolved_path = Path(path)
+    if not resolved_path.is_absolute():
+        resolved_path = PROJECT_ROOT / resolved_path
+    return pd.read_csv(resolved_path)
 
 
 def prepare_market_data(df: pd.DataFrame) -> pd.DataFrame:
