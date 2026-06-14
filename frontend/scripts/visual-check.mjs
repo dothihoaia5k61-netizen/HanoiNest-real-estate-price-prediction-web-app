@@ -63,6 +63,17 @@ async function runDesktop() {
   await page.screenshot({ path: demoPath, fullPage: false });
   const demoStepCount = await page.locator(".demo-step").count();
 
+  await page.locator("#technology").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(450);
+  const featurePath = path.join(outputDir, "desktop-editorial-features.png");
+  await page.screenshot({ path: featurePath, fullPage: false });
+  const featureCount = await page.locator(".feature-grid article").count();
+
+  await page.locator(".landing-cta").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(350);
+  const ctaPath = path.join(outputDir, "desktop-editorial-cta.png");
+  await page.screenshot({ path: ctaPath, fullPage: false });
+
   await page.goto("http://127.0.0.1:5173/dashboard", { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "Phân tích định giá" }).waitFor();
   await page.waitForFunction(
@@ -112,6 +123,7 @@ async function runDesktop() {
   await analysisResponse;
   await page.locator(".score-ring strong").waitFor();
   const dealScoreText = await page.locator(".score-ring strong").innerText();
+  const dealDeltaText = await page.locator(".deal-deltas").innerText();
   const dealPath = path.join(outputDir, "desktop-deal-analysis.png");
   await page.screenshot({ path: dealPath, fullPage: false });
 
@@ -120,9 +132,12 @@ async function runDesktop() {
     analyzingPath,
     resultPath,
     demoPath,
+    featurePath,
+    ctaPath,
     dashboardPath,
     dealPath,
     demoStepCount,
+    featureCount,
     analyzingPhase,
     resultPhase,
     factCount,
@@ -132,6 +147,7 @@ async function runDesktop() {
     computedDepthText,
     comparableRowCount,
     dealScoreText,
+    dealDeltaText,
   };
   await context.close();
 }
@@ -187,6 +203,7 @@ try {
 
 if (
   results.desktop.demoStepCount !== 5 ||
+  results.desktop.featureCount !== 4 ||
   results.desktop.analyzingPhase !== "analyzing" ||
   results.desktop.resultPhase !== "result" ||
   results.desktop.factCount !== 3 ||
@@ -196,6 +213,7 @@ if (
   results.desktop.computedDepthText !== "12.0 m" ||
   results.desktop.comparableRowCount < 1 ||
   Number(results.desktop.dealScoreText) < 1 ||
+  !results.desktop.dealDeltaText?.includes("%") ||
   results.mobile.mobileResultVisible !== true ||
   results.mobile.landingOverflow > 1 ||
   results.mobile.dashboardOverflow > 1 ||

@@ -142,7 +142,7 @@ a:focus-visible {
   margin: 28px 0 0;
   color: #313733;
   font-family: Inter, "Segoe UI Variable", "Segoe UI", Arial, sans-serif;
-  font-size: clamp(28px, 3vw, 46px);
+  font-size: clamp(25px, 2.5vw, 38px);
   font-weight: 650;
   line-height: 1.12;
 }
@@ -1121,7 +1121,7 @@ tbody tr:hover {
   }
 
   .hero-copy h2 {
-    font-size: 30px;
+    font-size: 25px;
   }
 
   .hero-actions {
@@ -1231,5 +1231,429 @@ tbody tr:hover {
     animation: none;
     transform: none;
     width: 100%;
+  }
+}
+
+/* Editorial polish */
+
+.valuation-demo {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  padding-right: max(24px, calc((100vw - 1180px) / 2));
+  padding-left: max(24px, calc((100vw - 1180px) / 2));
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(247, 245, 240, 0.99), rgba(247, 245, 240, 0.9) 58%, rgba(247, 245, 240, 0.7)),
+    url("./assets/hanoi-editorial-panorama.webp") right 35% / min(940px, 70vw) auto no-repeat;
+}
+
+.valuation-demo::after {
+  content: "";
+  position: absolute;
+  right: max(24px, calc((100vw - 1180px) / 2));
+  bottom: 58px;
+  width: min(46vw, 620px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(28, 128, 122, 0.32));
+  pointer-events: none;
+}
+
+.demo-layout {
+  position: relative;
+  z-index: 1;
+}
+
+.demo-terminal {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(188, 180, 168, 0.72);
+  box-shadow: 0 20px 55px rgba(72, 64, 51, 0.07);
+}
+
+.demo-terminal::before {
+  height: 1px;
+  background: linear-gradient(90deg, #1c807a, rgba(197, 111, 79, 0.55), transparent);
+}
+
+.feature-section {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  padding-right: max(24px, calc((100vw - 1180px) / 2));
+  padding-left: max(24px, calc((100vw - 1180px) / 2));
+  background:
+    linear-gradient(180deg, #f7f5f0 0%, #f1eee7 100%);
+  border-top: 1px solid rgba(179, 169, 155, 0.28);
+}
+
+.feature-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(28, 128, 122, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28, 128, 122, 0.035) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(90deg, transparent, black 50%, transparent);
+}
+
+.feature-section > * {
+  position: relative;
+}
+
+.feature-grid {
+  border-top-color: #d8d2c8;
+  border-bottom: 0;
+}
+
+.feature-grid article {
+  min-height: 230px;
+  padding: 30px clamp(18px, 2.2vw, 34px) 22px;
+  background: transparent;
+  border-right-color: #d8d2c8;
+  box-shadow: none;
+}
+
+.feature-grid article:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.feature-index {
+  margin-bottom: 48px;
+  color: #a46d58;
+}
+
+.landing-cta {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  min-height: 330px;
+  padding-right: max(24px, calc((100vw - 1180px) / 2));
+  padding-left: max(24px, calc((100vw - 1180px) / 2));
+  margin-bottom: 0;
+  overflow: hidden;
+  color: #29302c;
+  background:
+    linear-gradient(90deg, rgba(239, 235, 226, 0.99) 0%, rgba(239, 235, 226, 0.94) 45%, rgba(239, 235, 226, 0.4) 78%),
+    url("./assets/hanoi-editorial-panorama.webp") right center / auto 118% no-repeat,
+    #efebe2;
+  border-top: 1px solid #ddd6ca;
+  border-bottom: 1px solid #ddd6ca;
+  box-shadow: none;
+}
+
+.landing-cta::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 42%;
+  background: linear-gradient(0deg, rgba(247, 245, 240, 0.62), transparent);
+  pointer-events: none;
+}
+
+.landing-cta > * {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-cta .section-kicker {
+  color: #1c807a;
+}
+
+.landing-cta h2 {
+  max-width: 760px;
+  color: #29302c;
+}
+
+.landing-cta .button-primary {
+  color: #fff;
+  background: #1c807a;
+  border-color: #1c807a;
+}
+
+.dashboard-main {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(241, 237, 229, 0.9), rgba(245, 243, 238, 0.98) 390px),
+    #f5f3ee;
+}
+
+.dashboard-main::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: -30px;
+  width: min(820px, 65%);
+  height: 330px;
+  background:
+    linear-gradient(90deg, rgba(245, 243, 238, 0.96), rgba(245, 243, 238, 0.32)),
+    url("./assets/hanoi-editorial-panorama.webp") center right / cover no-repeat;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.dashboard-main::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 48px;
+  right: 3%;
+  width: 36%;
+  height: 210px;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(28, 128, 122, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28, 128, 122, 0.055) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(90deg, transparent, black);
+}
+
+.dashboard-intro {
+  min-height: 205px;
+  padding-top: 42px;
+  border-bottom-color: rgba(164, 155, 143, 0.38);
+}
+
+.premium-metric {
+  border-color: rgba(198, 190, 179, 0.72);
+  box-shadow: 0 7px 22px rgba(66, 59, 49, 0.035);
+}
+
+.dashboard-tabs {
+  border-color: rgba(198, 190, 179, 0.66);
+}
+
+.dashboard-panel,
+.deal-score-card,
+.loading-panel {
+  border-color: rgba(198, 190, 179, 0.7);
+  box-shadow: 0 8px 26px rgba(63, 57, 47, 0.035);
+}
+
+.deal-score-card {
+  min-height: 480px;
+  padding: 26px 28px 30px;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.97), rgba(248, 246, 241, 0.9));
+}
+
+.deal-layout {
+  grid-template-columns: minmax(260px, 0.62fr) minmax(0, 1.38fr);
+  gap: 0;
+}
+
+.deal-form {
+  padding: 24px 28px 24px 0;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid #e2ddd4;
+  border-radius: 0;
+}
+
+.deal-result {
+  min-height: 320px;
+  justify-content: flex-start;
+  gap: clamp(28px, 4vw, 52px);
+  padding: 30px 18px 30px 42px;
+  background:
+    radial-gradient(circle at 24% 50%, rgba(76, 140, 114, 0.09), transparent 34%);
+  border: 0;
+  border-radius: 0;
+}
+
+.score-ring {
+  width: 164px;
+  height: 164px;
+  background: conic-gradient(#4c8c72 var(--score), #dce7df 0);
+  box-shadow: 0 12px 35px rgba(76, 140, 114, 0.12);
+}
+
+.score-ring > div {
+  width: 132px;
+  height: 132px;
+  display: grid;
+  grid-template-columns: auto auto;
+  place-content: center;
+  align-items: baseline;
+  color: #2e3833;
+  background: #f8faf7;
+  box-shadow: inset 0 0 0 1px rgba(76, 140, 114, 0.08);
+}
+
+.score-ring > div small {
+  grid-column: 1 / -1;
+  margin-bottom: 3px;
+  color: #6c786f;
+  font-size: 7px;
+  font-weight: 850;
+}
+
+.score-ring strong {
+  color: #2e3833;
+}
+
+.score-ring span {
+  color: #7d867f;
+}
+
+.deal-copy {
+  flex: 1;
+}
+
+.deal-deltas {
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.deal-deltas span {
+  min-height: 112px;
+  align-content: center;
+  gap: 6px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  border-color: #ddd8cf;
+  border-radius: 4px;
+}
+
+.deal-deltas span small {
+  color: #747b75;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.deal-deltas b {
+  color: #303632;
+  font-size: 23px;
+}
+
+.deal-deltas em {
+  color: #737a73;
+  font-size: 9px;
+  font-style: normal;
+}
+
+.deal-deltas .delta-favorable {
+  background: #f1f7f3;
+  border-color: #cfe0d4;
+}
+
+.deal-deltas .delta-favorable b {
+  color: #39755e;
+}
+
+.deal-deltas .delta-caution {
+  background: #fbf3ee;
+  border-color: #ead4c8;
+}
+
+.deal-deltas .delta-caution b {
+  color: #a65f45;
+}
+
+.deal-copy ul {
+  color: #646b65;
+}
+
+@media (max-width: 900px) {
+  .valuation-demo,
+  .feature-section {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  .landing-cta {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  .deal-form {
+    padding-right: 0;
+    padding-bottom: 28px;
+    border-right: 0;
+    border-bottom: 1px solid #e2ddd4;
+  }
+
+  .deal-result {
+    padding: 32px 0 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .valuation-demo,
+  .feature-section {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-grid article {
+    min-height: auto;
+    padding: 28px 0;
+    border-right: 0;
+    border-bottom: 1px solid #d8d2c8;
+  }
+
+  .feature-grid article:last-child {
+    border-bottom: 0;
+  }
+
+  .feature-index {
+    margin-bottom: 24px;
+  }
+
+  .landing-cta {
+    min-height: 360px;
+    display: grid;
+    align-content: center;
+    padding-right: 18px;
+    padding-left: 18px;
+    background:
+      linear-gradient(180deg, rgba(239, 235, 226, 0.98), rgba(239, 235, 226, 0.78)),
+      url("./assets/hanoi-editorial-panorama.webp") 64% bottom / auto 72% no-repeat,
+      #efebe2;
+  }
+
+  .dashboard-main::before {
+    right: -120px;
+    width: 520px;
+    opacity: 0.26;
+  }
+
+  .dashboard-main::after {
+    display: none;
+  }
+
+  .dashboard-intro {
+    min-height: 250px;
+    padding-top: 38px;
+  }
+
+  .deal-score-card {
+    padding: 20px 16px 24px;
+  }
+
+  .deal-result {
+    display: grid;
+    justify-items: center;
+    gap: 24px;
+  }
+
+  .deal-copy {
+    width: 100%;
+  }
+
+  .deal-deltas {
+    grid-template-columns: 1fr;
   }
 }

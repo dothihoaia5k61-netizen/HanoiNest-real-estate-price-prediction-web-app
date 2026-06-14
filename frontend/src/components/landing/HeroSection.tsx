@@ -30,7 +30,7 @@ export function HeroSection() {
           HanoiNest
         </motion.h1>
         <motion.h2 variants={reveal}>
-          Hiểu giá nhà Hà Nội rõ hơn, bằng dữ liệu.
+          Nền tảng định giá bất động sản Hà Nội
         </motion.h2>
         <motion.p variants={reveal}>
           Định giá tài sản, so sánh mặt bằng khu vực và đọc vị trí thị trường qua

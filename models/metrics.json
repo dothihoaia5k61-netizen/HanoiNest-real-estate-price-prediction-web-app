@@ -1,26 +1,23 @@
 {
   "ridge_onehot": {
-    "rmse": 9702268773.471163,
-    "mae": 4052563093.9344726,
-    "r2": 0.7524495861006479,
-    "mape_percent": 36.1716799435316
+    "rmse": 9702356995.632814,
+    "mae": 4052583826.0309386,
+    "r2": 0.7524450841573532,
+    "mape_percent": 36.1712482025724
   },
   "random_forest": {
     "rmse": 8867446241.342426,
     "mae": 3528030655.535872,
     "r2": 0.7932173090745063,
-    "mape_percent": 32.50802091088944
+    "mape_percent": 32.508020910889456
   },
   "hist_gradient_boosting": {
-    "rmse": 8875163831.775496,
-    "mae": 3886574619.1721334,
-    "r2": 0.7928572147391808,
-    "mape_percent": 34.2671315149306
+    "rmse": 8875163831.77617,
+    "mae": 3886574619.1721034,
+    "r2": 0.7928572147391493,
+    "mape_percent": 34.26713151492874
   },
   "stacking_ensemble": {
-    "rmse": 8597938857.305586,
-    "mae": 3721377205.067824,
-    "r2": 0.8055957482979743,
-    "mape_percent": 33.42418132759264
+    "error": "BrokenProcessPool('A task has failed to un-serialize. Please ensure that the arguments of the function are all picklable.')"
   }
 }

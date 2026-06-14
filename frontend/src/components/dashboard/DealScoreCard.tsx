@@ -22,6 +22,17 @@ export function DealScoreCard({
   onUnitChange,
   onAnalyze,
 }: DealScoreCardProps) {
+  const gapTone = (value: number | null) => {
+    if (value === null) return "neutral";
+    return value <= 0 ? "favorable" : "caution";
+  };
+
+  const gapDescription = (value: number | null, reference: string) => {
+    if (value === null) return `Chưa đủ dữ liệu ${reference}`;
+    if (Math.abs(value) < 1) return `Gần sát ${reference}`;
+    return value < 0 ? `Thấp hơn ${reference}` : `Cao hơn ${reference}`;
+  };
+
   const submit = (event: FormEvent) => {
     event.preventDefault();
     onAnalyze();
@@ -83,6 +94,7 @@ export function DealScoreCard({
                 style={{ "--score": `${dealScore.score * 3.6}deg` } as CSSProperties}
               >
                 <div>
+                  <small>ĐIỂM GIAO DỊCH</small>
                   <strong>{dealScore.score}</strong>
                   <span>/100</span>
                 </div>
@@ -92,11 +104,15 @@ export function DealScoreCard({
                   <BadgeCheck size={15} /> {dealScore.label}
                 </span>
                 <div className="deal-deltas">
-                  <span>
-                    So với model <b>{formatPercent(dealScore.price_gap_percent)}</b>
+                  <span className={`delta-${gapTone(dealScore.price_gap_percent)}`}>
+                    <small>SO VỚI GIÁ DỰ ĐOÁN</small>
+                    <b>{formatPercent(dealScore.price_gap_percent)}</b>
+                    <em>{gapDescription(dealScore.price_gap_percent, "giá dự đoán")}</em>
                   </span>
-                  <span>
-                    So với thị trường <b>{formatPercent(dealScore.market_gap_percent)}</b>
+                  <span className={`delta-${gapTone(dealScore.market_gap_percent)}`}>
+                    <small>SO VỚI THỊ TRƯỜNG</small>
+                    <b>{formatPercent(dealScore.market_gap_percent)}</b>
+                    <em>{gapDescription(dealScore.market_gap_percent, "trung vị thị trường")}</em>
                   </span>
                 </div>
                 <ul>
